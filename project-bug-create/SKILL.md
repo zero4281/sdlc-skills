@@ -1,8 +1,11 @@
 ---
 name: project-bug-create
 description: Use this skill to triage, analyze, and document new issues in the Bugs.md file.
+
 ---
+
 # Skill Instructions
+
 **Constraint:** Do not modify any source code files, test files, or configuration files. This is a documentation-only workflow. Only modify `./Bugs.md`. Use the todowrite tool to manage this triage iteration.
 
 ⚠️ **AGENT BOUNDARY** — The orchestrator must NOT parse local project files or directly append entries to the bug tracking documents. All duplication scanning, technical dependency analysis, and document adjustments must be delegated to an @general agent.
@@ -27,6 +30,7 @@ Once intake details are received, use todowrite to create the analysis task and 
 > "[Insert User Bug Report Here]"
 > 
 > Analyze the codebase context to achieve the following:
+> 
 > 1. Check the 'Current Bug Reports' section of `./Bugs.md` to ensure the bug is not a duplicate.
 > 2. Cross-reference `./Requirements.md` and `./Plan.md` to identify dependencies and affected modules.
 > 3. Reference `./Testing Strategy.md` to determine if a new test case is required to reproduce or verify this bug.
