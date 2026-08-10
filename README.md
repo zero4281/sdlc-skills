@@ -12,13 +12,13 @@ These skills are designed to work with [OpenCode](https://opencode.ai/) but foll
 
 | Skill                  | Description                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------- |
-| `project-plan`         | Reconciles `Requirements.md` with the codebase and generates or updates `Plan.md`       |
-| `project-update`       | Performs a gap assessment between `Plan.md` and source code, generating `Update.md`     |
-| `project-implement`    | Orchestrates sequential source code updates based on the gaps identified in `Update.md` |
-| `project-update-tests` | Reviews and updates the test suite to reflect recent code changes                       |
-| `project-bug-create`   | Triages, analyzes, and documents new issues in `Bugs.md`                                |
-| `project-bug-fix`      | Selects, implements, verifies, and documents fixes for items in `Bugs.md`               |
-| `project-commit`       | Verifies test health, manages git branching conventions, and commits changes safely     |
+| `sdlc-plan`         | Reconciles `Requirements.md` with the codebase and generates or updates `Plan.md`       |
+| `sdlc-update`       | Performs a gap assessment between `Plan.md` and source code, generating `Update.md`     |
+| `sdlc-implement`    | Orchestrates sequential source code updates based on the gaps identified in `Update.md` |
+| `sdlc-update-tests` | Reviews and updates the test suite to reflect recent code changes                       |
+| `sdlc-bug-create`   | Triages, analyzes, and documents new issues in `Bugs.md`                                |
+| `sdlc-bug-fix`      | Selects, implements, verifies, and documents fixes for items in `Bugs.md`               |
+| `sdlc-commit`       | Verifies test health, manages git branching conventions, and commits changes safely     |
 
 ## Usage
 
@@ -29,7 +29,7 @@ These skills are designed to work with [OpenCode](https://opencode.ai/) but foll
 2. Invoke a skill by name from within your OpenCode session:
    
    ```
-   /project-plan
+    /sdlc-plan
    ```
 
 3. The agent will execute the skill's phases sequentially, delegating file analysis and code changes to sub-agents as needed.
@@ -47,10 +47,10 @@ Each skill is a self-contained markdown file with clearly defined phases and age
 For a greenfield project or major feature cycle, run the skills in this order:
 
 ```
-project-plan → project-update → project-implement → project-update-tests → project-commit
+sdlc-plan → sdlc-update → sdlc-implement → sdlc-update-tests → sdlc-commit
 ```
 
-Use `project-bug-create` and `project-bug-fix` at any point in the cycle to track and resolve issues.
+Use `sdlc-bug-create` and `sdlc-bug-fix` at any point in the cycle to track and resolve issues.
 
 ## Contributing
 

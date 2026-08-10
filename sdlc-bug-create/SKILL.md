@@ -1,5 +1,5 @@
 ---
-name: project-bug-create
+name: sdlc-bug-create
 description: Use this skill to triage, analyze, reproduce via manual terminal verification, and document new issues in the Bugs.md file.
 ---
 
@@ -64,4 +64,4 @@ Once approved by the user, use `todowrite` to create the write step and assign i
 > 
 > Return a confirmation when the file has been successfully saved.
 
-**WAIT:** Once confirmed, inform the user that the bug has been successfully tracked and is ready for the `project-bug-fix` pipeline.
+**WAIT:** Once confirmed, inform the user that the bug has been successfully tracked and is ready for the `sdlc-bug-fix` pipeline.

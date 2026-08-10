@@ -1,5 +1,5 @@
 ---
-name: project-update
+name: sdlc-update
 description: Use this skill to perform a gap assessment between Requirements.md, Plan.md, and the source code, generating or replacing Update.md.
 ---
 
@@ -23,7 +23,7 @@ Use `todowrite` to create the following code assessment step and assign it to @g
 > **IMPORTANT:** Parse the **Revision History** table at the end of `./Requirements.md`. Identify all revisions spanning from the current implementation baseline up to the target version (including any skipped or intermediate versions like `1.1.1` $\rightarrow$ `1.1.2`). Build a cumulative list of all required changes across these revisions.
 > 
 > Read `./Plan.md` to establish the active development baseline, explicitly ignoring Section 3 (Testing & Verification Status). Treat Requirements.md as a strict override if any contradictions exist between the Plan and the Requirements.
-> Check if `./Update.md` currently contains the placeholder text "Update.md is stale — re-run /project-update." If it does, ignore the current content of Update.md completely.
+> Check if `./Update.md` currently contains the placeholder text "Update.md is stale — re-run /sdlc-update." If it does, ignore the current content of Update.md completely.
 > Review all local source code files, explicitly ignoring any files inside designated test directories defined in `./Testing Strategy.md`.
 > 
 > Perform a comprehensive multi-way gap assessment across the cumulative Requirements delta, the Plan, and the active codebase to identify:

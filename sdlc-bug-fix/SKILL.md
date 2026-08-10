@@ -1,5 +1,5 @@
 ---
-name: project-bug-fix
+name: sdlc-bug-fix
 description: Use this skill to select, implement, verify via manual dynamic testing then automated testing, and document fixes for items in the Bugs.md file.
 ---
 

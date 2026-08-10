@@ -1,5 +1,5 @@
 ---
-name: project-commit
+name: sdlc-commit
 description: Use this skill to verify test health, manage git branching conventions, and commit code changes safely.
 ---
 

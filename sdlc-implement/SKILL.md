@@ -1,5 +1,5 @@
 ---
-name: project-implement
+name: sdlc-implement
 description: Use this skill to orchestrate and execute source code updates based on the gaps identified in Update.md.
 ---
 
