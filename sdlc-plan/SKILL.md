@@ -1,5 +1,5 @@
 ---
-name: project-plan
+name: sdlc-plan
 description: Use this skill to perform a gap analysis between Requirements.md and the codebase, then generate or update Plan.md.
 ---
 

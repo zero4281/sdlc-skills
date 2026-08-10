@@ -1,5 +1,5 @@
 ---
-name: project-update-tests
+name: sdlc-update-tests
 description: Use this skill to review and update the test suite after code changes.
 ---
 
@@ -62,7 +62,7 @@ Each delegation prompt must include:
 - **Unresolvable Blockers & Bug Filing:** If a test fails due to a bug or limitation in core source code (which cannot be modified per constraints):
   1. Stop attempting to modify the test file.
   2. Gather the exact core code failure details, including steps to reproduce, expected vs. actual behavior, and affected source files.
-  3. Formulate a structured bug summary and invoke/trigger the `project-bug-create` skill to log the issue into `./Bugs.md`.
+  3. Formulate a structured bug summary and invoke/trigger the `sdlc-bug-create` skill to log the issue into `./Bugs.md`.
   4. Mark the item as blocked due to an open core bug report.
 
 **WAIT:** Do not begin Phase 3 until all fix items are marked complete or explicitly reported as blocked with a filed bug report.
@@ -83,7 +83,7 @@ Each delegation prompt must include:
    
    - For each failure, use `todowrite` to create a separate work item assigned to an `@general` agent. 
    - Instruct `@general` to analyze the specific test failure, inspect the test file, apply the required fix within the test directory, and re-run the specific test using the extracted test runner command (e.g., `pytest Tests/test_file.py::test_name`) to confirm the fix works. **Do not use `python -c` snippets.**
-   - If a test cannot pass because of a defect in core source implementation code, instruct `@general` to gather the details, invoke `project-bug-create` to file the bug report in `./Bugs.md`, and document the blocker.
+   - If a test cannot pass because of a defect in core source implementation code, instruct `@general` to gather the details, invoke `sdlc-bug-create` to file the bug report in `./Bugs.md`, and document the blocker.
    - Execute these fix items one at a time.
    
    **WAIT:** Do not proceed until both testing layers pass cleanly.
@@ -91,7 +91,7 @@ Each delegation prompt must include:
 3. **Final Suite Validation:**
    Once all fix items are complete, assign a final step to an `@general` agent to **re-run the entire test suite execution command** extracted from `./Testing Strategy.md`. 
    
-**WAIT:** Repeat this verification loop until an `@general` agent explicitly confirms that the **entire test suite runs and passes cleanly with zero failures** (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `project-bug-create`).
+**WAIT:** Repeat this verification loop until an `@general` agent explicitly confirms that the **entire test suite runs and passes cleanly with zero failures** (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `sdlc-bug-create`).
 
 ---
 
