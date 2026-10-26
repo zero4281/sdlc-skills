@@ -5,11 +5,15 @@ description: Use this skill to review and update the test suite after code chang
 
 # Skill Instructions
 
-**Constraint:** Do not modify any core source files. Only modify files located within the test directories defined in `./Testing Strategy.md`. Use the `todowrite` tool to track all execution items.
+**Constraint:** Do not modify any core source files. Only modify files located within the test directories defined in `./Testing Strategy.md`. Use the `todowrite` tool (requires `experimental.todo: true`) to track all execution items.
 
 ⚠️ **STRICT AGENT BOUNDARY & ORCHESTRATION RULES:**
 - You are acting SOLELY as an **orchestrator**. You must NOT perform direct work (file edits, code analysis, or terminal execution) in the main interface.
-- All technical inspection, file updates, and shell executions MUST be delegated to an `@general` agent via `todowrite`.
+- All technical inspection, file updates, and shell executions MUST be delegated via the `subagent` tool.
+- Call `subagent` with `agent` (`general`, or `explore` for read-only analysis), a short `description`, and a complete, self-contained `prompt`. Subagents start with fresh context, so restate every path, selection, and constraint.
+- Make one `subagent` call at a time and wait for its returned summary before continuing.
+- V2 subagents cannot launch their own subagents (`experimental.subagent_depth` defaults to 1). All delegation happens from this orchestrator; a subagent that hits a blocker returns and you decide the next step.
+- `todowrite` is progress tracking only (requires `experimental.todo: true`). Use it to record phases and completion state; it does not dispatch work.
 
 **EXECUTION POLICY:** Perform workflow steps strictly in sequence. Do not spawn concurrent agents. Wait for each returned summary before proceeding.
 
@@ -17,9 +21,9 @@ description: Use this skill to review and update the test suite after code chang
 
 ## Phase 1 — Analyze
 
-**Constraint:** You must execute these items sequentially. Do not batch them. Wait for the summary of each step before creating the next. You must NOT read the files to perform this analysis yourself—delegate everything to `@general`.
+**Constraint:** You must execute these items sequentially. Do not batch them. Wait for the summary of each step before creating the next. You must NOT read the files to perform this analysis yourself—delegate everything to a `subagent` call.
 
-Use `todowrite` to create the following three analysis steps and assign each to @general. 
+Record the following three analysis steps with `todowrite` and dispatch each through the `subagent` tool (`agent: general`, sequential calls only). 
 
 Include the following context in every delegation prompt:
 
@@ -49,7 +53,7 @@ Include the following context in every delegation prompt:
 
 ## Phase 2 — Fix & Verify
 
-Once all three analysis steps are complete and their summaries are returned, use `todowrite` to create one item per finding. Assign each item to @general one at a time.
+Once all three analysis steps are complete and their summaries are returned, record one `todowrite` item per finding and dispatch each through the `subagent` tool (`agent: general`) one at a time.
 
 **Constraint:** You must create and execute these items one at a time. Wait for the agent to confirm the fix before moving to the next finding.
 
@@ -62,7 +66,7 @@ Each delegation prompt must include:
 - **Unresolvable Blockers & Bug Filing:** If a test fails due to a bug or limitation in core source code (which cannot be modified per constraints):
   1. Stop attempting to modify the test file.
   2. Gather the exact core code failure details, including steps to reproduce, expected vs. actual behavior, and affected source files.
-  3. Formulate a structured bug summary and invoke/trigger the `sdlc-bug-create` skill to log the issue into `./Bugs.md`.
+  3. Formulate a structured bug summary and return it to the orchestrator, which loads the `sdlc-bug-create` skill to log the issue into `./Bugs.md`. Do not attempt to load the skill or launch agents yourself (`subagent_depth` defaults to 1).
   4. Mark the item as blocked due to an open core bug report.
 
 **WAIT:** Do not begin Phase 3 until all fix items are marked complete or explicitly reported as blocked with a filed bug report.
@@ -71,33 +75,33 @@ Each delegation prompt must include:
 
 ## Phase 3 — Verify & Retest
 
-**Constraint:** The orchestrator must not run test execution commands directly. Spawn an `@general` agent to execute all test runs and analyze failures.
+**Constraint:** The orchestrator must not run test execution commands directly. Spawn a `general` subagent via the `subagent` tool to execute all test runs and analyze failures.
 
 1. **Initial Verification Run:**
-   Use `todowrite` to create the following item and assign it to an `@general` agent:
+   Record the following item with `todowrite`, then dispatch it through the `subagent` tool (`agent: general`):
    
    > Read `./Testing Strategy.md` to extract the primary test suite command from the top section of the file (e.g., `pytest Tests/`). Execute that exact command in the terminal. **Do not use `python -c` snippets.** Analyze the full test runner output. If all tests pass, return a summary confirming 100% pass rate. If any tests fail, list every failing test name, the specific assertion failure/error output, and the file location.
    
 2. **Iterative Repair Loop:**
    If there are failing tests:
    
-   - For each failure, use `todowrite` to create a separate work item assigned to an `@general` agent. 
-   - Instruct `@general` to analyze the specific test failure, inspect the test file, apply the required fix within the test directory, and re-run the specific test using the extracted test runner command (e.g., `pytest Tests/test_file.py::test_name`) to confirm the fix works. **Do not use `python -c` snippets.**
-   - If a test cannot pass because of a defect in core source implementation code, instruct `@general` to gather the details, invoke `sdlc-bug-create` to file the bug report in `./Bugs.md`, and document the blocker.
+   - For each failure, record a separate `todowrite` item and dispatch it through the `subagent` tool (`agent: general`). 
+   - Instruct the `general` subagent to analyze the specific test failure, inspect the test file, apply the required fix within the test directory, and re-run the specific test using the extracted test runner command (e.g., `pytest Tests/test_file.py::test_name`) to confirm the fix works. **Do not use `python -c` snippets.**
+   - If a test cannot pass because of a defect in core source implementation code, instruct the `general` subagent to gather the details and return a structured blocker report; the orchestrator then loads the `sdlc-bug-create` skill to file the bug report in `./Bugs.md` and documents the blocker.
    - Execute these fix items one at a time.
    
    **WAIT:** Do not proceed until both testing layers pass cleanly.
    
 3. **Final Suite Validation:**
-   Once all fix items are complete, assign a final step to an `@general` agent to **re-run the entire test suite execution command** extracted from `./Testing Strategy.md`. 
+   Once all fix items are complete, dispatch a final `subagent` call (`agent: general`) to **re-run the entire test suite execution command** extracted from `./Testing Strategy.md`. 
    
-**WAIT:** Repeat this verification loop until an `@general` agent explicitly confirms that the **entire test suite runs and passes cleanly with zero failures** (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `sdlc-bug-create`).
+**WAIT:** Repeat this verification loop until the `general` subagent explicitly confirms that the **entire test suite runs and passes cleanly with zero failures** (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `sdlc-bug-create`).
 
 ---
 
 ## Phase 4 — Update Testing Strategy
 
-Use `todowrite` to create the following update item and assign it to @general:
+Record the following update item with `todowrite`, then call the `subagent` tool with `agent: general`:
 
 > Update `./Testing Strategy.md` only:
 > 

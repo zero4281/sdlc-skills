@@ -5,11 +5,15 @@ description: Use this skill to select, implement, verify via manual dynamic test
 
 # Skill Instructions
 
-**Constraint:** Do not modify any files inside designated test directories or configuration metrics during this initial execution loop. Only modify the targeted source code files requiring the fix and update `./Bugs.md`. Use the `todowrite` tool to track the lifecycle of this fix.
+**Constraint:** Do not modify any files inside designated test directories or configuration metrics during this initial execution loop. Only modify the targeted source code files requiring the fix and update `./Bugs.md`. Use the `todowrite` tool (requires `experimental.todo: true`) to track the lifecycle of this fix.
 
 ⚠️ **STRICT AGENT BOUNDARY & ORCHESTRATION RULES:**
 - You are acting SOLELY as an **orchestrator**. You must NOT perform direct work (file edits, code analysis, or terminal execution) in the main interface.
-- All technical inspection, file updates, interactive session setups, and shell executions MUST be delegated to an `@general` agent via `todowrite`.
+- All technical inspection, file updates, interactive session setups, and shell executions MUST be delegated via the `subagent` tool.
+- Call `subagent` with `agent` (`general`, or `explore` for read-only analysis), a short `description`, and a complete, self-contained `prompt`. Subagents start with fresh context, so restate every path, selection, and constraint.
+- Make one `subagent` call at a time and wait for its returned summary before continuing.
+- V2 subagents cannot launch their own subagents (`experimental.subagent_depth` defaults to 1). All delegation happens from this orchestrator; a subagent that hits a blocker returns and you decide the next step.
+- `todowrite` is progress tracking only (requires `experimental.todo: true`). Use it to record phases and completion state; it does not dispatch work.
 
 **EXECUTION POLICY:** Run repairs sequentially on exactly one bug at a time. Do not initiate an agent modification loop until the user has explicitly selected an item and the previous code state has been verified.
 
@@ -17,18 +21,18 @@ description: Use this skill to select, implement, verify via manual dynamic test
 
 ## Phase 1 — Select Target Bug
 
-Use the native `todowrite` tool to record an initial parsing item and delegate it to @general.
+Record an initial parsing item with `todowrite`, then call the `subagent` tool with `agent: explore` (read-only parsing of `./Bugs.md`).
 
 > Read `./Bugs.md`.
 > Parse `./Bugs.md` to compile a clean list of all pending, uncompleted bug items (including titles, priorities, and dependencies). Return this list to the orchestrator.
 
-**WAIT:** Once the list is returned, present it to the user via AskUserQuestion and wait for them to explicitly select which bug item to resolve.
+**WAIT:** Once the list is returned, present it to the user via the `question` tool (one choice per pending bug item) and wait for them to explicitly select which bug item to resolve.
 
 ---
 
 ## Phase 2 — Targeted Delegation, Fix & Self-Verification
 
-Print the message: "Starting work on [Selected Bug Title]." Immediately follow this by using the native `todowrite` tool to record the implementation item and delegate it to @general.
+Print the message: "Starting work on [Selected Bug Title]." Immediately follow this by recording the implementation item with `todowrite`, then dispatch it with the `subagent` tool (`agent: general`).
 
 > 1. **Context & Safety Review:** 
 >    
@@ -47,13 +51,13 @@ Print the message: "Starting work on [Selected Bug Title]." Immediately follow t
 >    
 > Once syntax check passes cleanly and `git diff` confirms accurate edits, return a summary detailing the changes made and the files modified.
 
-**WAIT:** Do not proceed until @general reports successful completion of code modifications and self-verification.
+**WAIT:** Do not proceed until the `general` subagent reports successful completion of code modifications and self-verification.
 
 ---
 
 ## Phase 3 — Context Re-Ingestion, Verification & Regression Testing
 
-Use the native `todowrite` tool to record a verification item and delegate the execution to @general. **Ensure the delegation prompt explicitly carries forward the [Selected Bug Title].**
+Record a verification item with `todowrite`, then call the `subagent` tool with `agent: general` for the execution. **Ensure the delegation prompt explicitly carries forward the [Selected Bug Title].**
 
 > **Context Synchronization:** Before beginning verification:
 > 
@@ -78,7 +82,7 @@ Use the native `todowrite` tool to record a verification item and delegate the e
 > 
 > Return the verification summaries and test results to the orchestrator.
 > 
-> **ERROR HANDLING LOOP:** If manual dynamic captures reveal defects, OR if the automated test suite fails, apply the necessary source code fix directly to the active working repository source files and repeat the verification loop until manual dynamic captures confirm stable, intended behavior. Do not attempt to spawn external sub-agents.
+> **ERROR HANDLING LOOP:** If manual dynamic captures reveal defects, OR if the automated test suite fails, apply the necessary source code fix directly to the active working repository source files and repeat the verification loop until manual dynamic captures confirm stable, intended behavior. You cannot launch subagents (`subagent_depth` defaults to 1); apply the fix in place or return the failure to the orchestrator.
 > 
 > **WAIT:** Do not proceed until both testing layers pass cleanly.
 
@@ -86,6 +90,6 @@ Use the native `todowrite` tool to record a verification item and delegate the e
 
 ## Phase 4 — Finalize Tracking
 
-Once the fix passes all verification checks, use the native `todowrite` tool to record the final tracking update step and delegate it to @general.
+Once the fix passes all verification checks, record the final tracking update step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
 > Update `./Bugs.md` to officially mark the selected bug item as complete. Include a brief, high-level summary of the resolution changes under its entry or tracking log.
