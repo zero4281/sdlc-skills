@@ -5,26 +5,30 @@ description: Use this skill to triage, analyze, reproduce via manual terminal ve
 
 # Skill Instructions
 
-**Constraint:** Do not modify any source code files, test files, or configuration files. This is a documentation-only workflow. Only modify `./Bugs.md`. Use the `todowrite` tool to manage this triage iteration.
+**Constraint:** Do not modify any source code files, test files, or configuration files. This is a documentation-only workflow. Only modify `./Bugs.md`. Use the `todowrite` tool (requires `experimental.todo: true`) to manage this triage iteration.
 
 ⚠️ **STRICT AGENT BOUNDARY & ORCHESTRATION RULES:**
 - You are acting SOLELY as an **orchestrator**. You must NOT perform direct work (file edits, code analysis, or terminal execution) in the main interface.
-- All technical inspection, file updates, and shell executions MUST be delegated to an `@general` agent via `todowrite`.
+- All technical inspection, file updates, and shell executions MUST be delegated via the `subagent` tool.
+- Call `subagent` with `agent` (`general`, or `explore` for read-only analysis), a short `description`, and a complete, self-contained `prompt`. Subagents start with fresh context, so restate every path, selection, and constraint.
+- Make one `subagent` call at a time and wait for its returned summary before continuing.
+- V2 subagents cannot launch their own subagents (`experimental.subagent_depth` defaults to 1). All delegation happens from this orchestrator; a subagent that hits a blocker returns and you decide the next step.
+- `todowrite` is progress tracking only (requires `experimental.todo: true`). Use it to record phases and completion state; it does not dispatch work.
 
-**EXECUTION POLICY:** Perform steps strictly in sequence. Do not spawn concurrent agents. You must pause and wait for explicit user approval via AskUserQuestion before finalizing and appending any bug entry to the filesystem.
+**EXECUTION POLICY:** Perform steps strictly in sequence. Do not spawn concurrent agents. You must pause and wait for explicit user approval via the `question` tool before finalizing and appending any bug entry to the filesystem.
 
 ---
 
 ## Phase 1 — Information Gathering & Intake
 
-Use AskUserQuestion to prompt the user for a clear, concise description of the issue.
+Use the `question` tool to prompt the user for a clear, concise description of the issue. Provide a short header such as `Bug report` and at least one choice (for example, `Describe the issue`); a free-form answer is always available.
 *Optional:* Request the user to estimate severity, provide specific reproduction steps, or mention known environmental details if available.
 
 ---
 
 ## Phase 2 — Technical Analysis, Manual Verification & Drafting
 
-Once intake details are received, use `todowrite` to create the combined analysis and manual verification step and assign it to @general.
+Once intake details are received, record the combined analysis and manual verification step with `todowrite`, then call the `subagent` tool with `agent: general` (interactive shell reproduction is required).
 
 > Read `./Requirements.md`, `./Plan.md`, `./Testing Strategy.md`, and the existing `./Bugs.md`.
 > Parse the user's provided bug report:
@@ -49,7 +53,7 @@ Once intake details are received, use `todowrite` to create the combined analysi
 
 ## Phase 3 — User Verification
 
-Review the entry drafted by @general. Use AskUserQuestion to present the draft directly to the user for structural review and validation. 
+Review the entry drafted by the `general` subagent. Use the `question` tool to present the draft directly to the user for structural review and validation (offer choices such as `Approve` and `Request changes`). 
 
 **WAIT:** Do not proceed to Phase 4 until the user provides explicit approval. If the user requests alterations, re-run Phase 2 with their feedback.
 
@@ -57,7 +61,7 @@ Review the entry drafted by @general. Use AskUserQuestion to present the draft d
 
 ## Phase 4 — Document Finalization
 
-Once approved by the user, use `todowrite` to create the write step and assign it to @general.
+Once approved by the user, record the write step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
 > Append the approved bug entry to the 'Current Bug Reports' section of `./Bugs.md`.
 > Update the 'Project Roadmap' or status summary section within `./Bugs.md` to reflect the new tracked item.

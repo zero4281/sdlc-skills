@@ -6,7 +6,7 @@ A collection of AI agent skills for orchestrating SDLC workflows: project planni
 
 `sdlc-skills` provides a set of structured, reusable skills for AI coding agents. Each skill defines a multi-phase workflow that guides your agent through a specific stage of the software development lifecycle — from initial planning all the way through to committing and shipping code.
 
-These skills are designed to work with [OpenCode](https://opencode.ai/) but follow a general pattern compatible with other agentic coding tools that support custom skill/instruction files.
+These skills are written for [OpenCode V2](https://opencode.ai/v2/docs/) but follow a general pattern compatible with other agentic coding tools that support custom skill/instruction files.
 
 ## Skills
 
@@ -20,19 +20,35 @@ These skills are designed to work with [OpenCode](https://opencode.ai/) but foll
 | `sdlc-bug-fix`      | Selects, implements, verifies, and documents fixes for items in `Bugs.md`               |
 | `sdlc-commit`       | Verifies test health, manages git branching conventions, and commits changes safely     |
 
+## Requirements (OpenCode V2)
+
+- **Subagents.** Every skill is an orchestrator: it never edits files or runs commands itself. Work is delegated with the `subagent` tool to the built-in `general` subagent (or `explore` for read-only analysis). Leave `experimental.subagent_depth` at its default of `1`; the skills never rely on nested delegation.
+- **Todo tracking.** Skills record progress with `todowrite`, which is disabled unless you opt in:
+
+  ```jsonc
+  {
+    "$schema": "https://opencode.ai/config.json",
+    "experimental": { "todo": true },
+  }
+  ```
+
+  Without the flag the skills still work; they simply track phases in the conversation instead of a todo list.
+- **Skill IDs.** In V2 the skill ID is the directory name, not the frontmatter `name` (that field is a display label). Keep the layout `skills/<skill-id>/SKILL.md`.
+
 ## Usage
 
 ### With OpenCode
 
-1. Copy the desired `SKILL.md` files into your project's skills directory (e.g., `.opencode/skills/`).
+1. Copy the desired skill directories into your skills directory, either global (`~/.config/opencode/skills/`) or project-local (`.opencode/skills/`), preserving the `<skill-id>/SKILL.md` layout.
 
-2. Invoke a skill by name from within your OpenCode session:
-   
-   ```
-    /sdlc-plan
-   ```
+2. Load a skill in one of these ways:
 
-3. The agent will execute the skill's phases sequentially, delegating file analysis and code changes to sub-agents as needed.
+   - Mention it directly, e.g. `@sdlc-plan`.
+   - Ask the agent to load it by ID ("load the `sdlc-plan` skill"), which uses the `skill` tool.
+
+   Slash commands such as `/sdlc-plan` only exist if you also define a matching file under `.opencode/commands/`.
+
+3. The agent will execute the skill's phases sequentially, delegating analysis, file changes, and shell commands to subagents as needed.
 
 ### With Other Platforms
 
@@ -40,7 +56,17 @@ Each skill is a self-contained markdown file with clearly defined phases and age
 
 - Point your agent at the `SKILL.md` file as a system prompt or instruction file.
 - Ensure your platform supports multi-step, sequential task execution and sub-agent delegation.
-- Replace any platform-specific tool references (e.g., `todowrite`, `AskUserQuestion`) with the equivalent tools available in your environment.
+- Replace any platform-specific tool references with the equivalent tools available in your environment.
+
+The OpenCode V2 tool names used throughout these skills are:
+
+| Concept            | OpenCode V2 tool                                  |
+| ------------------ | ------------------------------------------------- |
+| Delegate work      | `subagent`                                        |
+| Ask the user       | `question`                                        |
+| Track progress     | `todowrite` (requires `experimental.todo: true`)   |
+| Load another skill | `skill`                                           |
+| Run a command      | `shell`                                           |
 
 ### Recommended Workflow Order
 

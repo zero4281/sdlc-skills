@@ -5,11 +5,15 @@ description: Use this skill to verify test health, manage git branching conventi
 
 # Skill Instructions
 
-**Constraint:** Do not bypass failing tests. Use the `todowrite` tool to manage commit lifecycle tracking.
+**Constraint:** Do not bypass failing tests. Use the `todowrite` tool (requires `experimental.todo: true`) to manage commit lifecycle tracking.
 
 ⚠️ **STRICT AGENT BOUNDARY & ORCHESTRATION RULES:**
 - You are acting SOLELY as an **orchestrator**. You must NOT perform direct work (file edits, code analysis, or terminal execution) in the main interface.
-- All technical inspection, file updates, and shell executions MUST be delegated to an `@general` agent via `todowrite`.
+- All technical inspection, file updates, and shell executions MUST be delegated via the `subagent` tool.
+- Call `subagent` with `agent` (`general`, or `explore` for read-only analysis), a short `description`, and a complete, self-contained `prompt`. Subagents start with fresh context, so restate every path, selection, and constraint.
+- Make one `subagent` call at a time and wait for its returned summary before continuing.
+- V2 subagents cannot launch their own subagents (`experimental.subagent_depth` defaults to 1). All delegation happens from this orchestrator; a subagent that hits a blocker returns and you decide the next step.
+- `todowrite` is progress tracking only (requires `experimental.todo: true`). Use it to record phases and completion state; it does not dispatch work.
 
 **EXECUTION POLICY:** Perform lifecycle steps strictly in sequence. If a preceding phase fails (e.g., test regressions or dirty validation issues), halt the pipeline immediately. Do not execute any subsequent git mutations or pushes.
 
@@ -17,7 +21,7 @@ description: Use this skill to verify test health, manage git branching conventi
 
 ## Phase 1 — Pre-Commit Testing Verification
 
-Before attempting any version control actions, use `todowrite` to create a test verification step and assign it to @general.
+Before attempting any version control actions, record a test verification step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
 > Read `./Testing Strategy.md` to extract the primary test suite execution command.
 > Execute the full regression test suite using that exact command.
@@ -31,7 +35,7 @@ Before attempting any version control actions, use `todowrite` to create a test 
 
 ## Phase 2 — Branch Management Analysis
 
-Once tests are verified to pass, use `todowrite` to create a branch assessment step and assign it to @general.
+Once tests are verified to pass, record a branch assessment step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
 > Read the current version number from `./Plan.md`.
 > Inspect the current local repository git state.
@@ -51,7 +55,7 @@ Once tests are verified to pass, use `todowrite` to create a branch assessment s
 
 ## Phase 3 — Stage, Document, and Commit
 
-Use `todowrite` to create the staging and commit generation step and assign it to @general.
+Record the staging and commit generation step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
 > 1. Check `git status` and scan for untracked artifacts using `git ls-files --others --exclude-standard` to ensure all relevant files are captured.
 > 2. Ingest the modifications made to the codebase and auto-generate a git commit message.
@@ -59,5 +63,6 @@ Use `todowrite` to create the staging and commit generation step and assign it t
 > **COMMIT MESSAGE CONSTRAINT:** The commit subject (first line) must be concise (maximum 72 characters) suitable for use as a Pull Request title. Optionally, include a brief body description below a blank line for necessary context. Avoid long lists or multi-paragraph blocks.
 > 
 > 3. Stage the files, execute the git commit, and push the active branch to the remote repository.
+>    **Note:** V2 may return an `ask` permission prompt for `git push`. Surface it to the user and wait rather than retrying or working around it.
 > 
 > Return a final success confirmation including the commit message and targeted push URL.
