@@ -91,4 +91,4 @@ Please keep skills focused on a single, well-defined workflow stage.
 
 ## License
 
-MIT
+GPL-3.0. See [LICENSE](LICENSE) for the full text.
