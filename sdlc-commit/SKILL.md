@@ -23,8 +23,9 @@ description: Use this skill to verify test health, manage git branching conventi
 
 Before attempting any version control actions, record a test verification step with `todowrite`, then call the `subagent` tool with `agent: general`.
 
-> Read `./Testing Strategy.md` to extract the primary test suite execution command.
-> Execute the full regression test suite using that exact command.
+> Read `./Testing Strategy.md` to extract the primary test suite execution command the document designates.
+> Execute exactly that command. Do not substitute a longer or stricter suite for it.
+> If the document also defines release-only, exhaustive, or full-regression commands, they are out of scope for this step; do not run them.
 > Return the final test status to the orchestrator.
 > 
 > **CRITICAL:** If any tests fail, report the failures immediately and abort the workflow. Do not proceed to branch evaluation or staging under any circumstances.

@@ -57,11 +57,11 @@ Each `subagent` prompt for a Work Item must instruct the `general` subagent to p
 
 ---
 
-## Phase 3 — Integrated Retesting & Unit Suite Validation
+## Phase 3 — Integrated Retesting & Automated Test Suite Validation
 
-Once all individual work items from Phase 2 are complete and marked off in `./Plan.md`, record the final validation step with `todowrite`, then call the `subagent` tool with `agent: general` to perform integrated dynamic testing and run the automated unit test suite.
+Once all individual work items from Phase 2 are complete and marked off in `./Plan.md`, record the final validation step with `todowrite`, then call the `subagent` tool with `agent: general` to perform integrated dynamic testing and run the designated automated test suite.
 
-The orchestrator must instruct the `general` subagent to read `./Testing Strategy.md` to extract mandatory testing constraints, execution environments, session logging/capture patterns, special sandbox/isolation protocols, interactive verification lifecycles, and automated unit test commands.
+The orchestrator must instruct the `general` subagent to read `./Testing Strategy.md` to extract mandatory testing constraints, execution environments, session logging/capture patterns, special sandbox/isolation protocols, interactive verification lifecycles, and the designated test suite execution command.
 
 Instruct the `general` subagent to execute the complete verification lifecycle according to the procedures outlined in `./Testing Strategy.md`, enforcing the following rules as clear, explicit constraints in the prompt:
 
@@ -71,10 +71,10 @@ Instruct the `general` subagent to execute the complete verification lifecycle a
   2. **Post-Failure Sync:** If verification fails, apply code fixes directly to the **active working repository**, *not* inline inside the sandbox.
 - **DUAL VERIFICATION EXECUTION:**
   1. **Full Manual Dynamic Retest:** Execute end-to-end manual dynamic testing across all integrated changes using session runner procedures specified in `./Testing Strategy.md` to confirm overall system stability.
-  2. **Automated Unit Test Suite Run:** Execute the project's full automated unit test suite using the exact command specified in `./Testing Strategy.md`. Ensure all pre-existing and new unit tests pass cleanly.
+  2. **Automated Test Suite Run:** Execute the primary test suite execution command designated by `./Testing Strategy.md`. Do not substitute a longer or stricter suite for it — release-only, exhaustive, and full-regression suites are out of scope for this step. Ensure all pre-existing and new tests pass cleanly.
 - **Scratch Artifacts:** State captures, execution logs, and output dumps must be written strictly to scratch/temporary locations (e.g., `/tmp/`).
 - **Session Cleanup:** The application instance or interactive test session must be explicitly terminated and cleaned up once final verification states are captured.
-- **INLINE ERROR REPAIR:** If manual dynamic retesting or automated unit testing reveals failures during execution, apply necessary fixes directly to the source code files and repeat the verification loop until all manual dynamic captures and unit test runs confirm stable, intended behavior.
+- **INLINE ERROR REPAIR:** If manual dynamic retesting or automated unit testing reveals failures during execution, apply necessary fixes directly to the source code files and repeat the verification loop until all manual dynamic captures and automated test runs confirm stable, intended behavior.
 
 Review the resulting artifacts returned by the `general` subagent:
 - Verify that specific feature changes, success states, or outputs expected from `Update.md` requirements are visible in captured application states.
