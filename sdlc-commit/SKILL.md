@@ -40,17 +40,22 @@ Once tests are verified to pass, record a branch assessment step with `todowrite
 
 > Read the current version number from `./Plan.md`.
 > Inspect the current local repository git state.
-> 1. Identify the current active branch name.
-> 2. If the current branch is `main`:
+> 1. Resolve the repository's default branch name with git. Never assume it is `main`:
+>    - Prefer `git symbolic-ref --short refs/remotes/origin/HEAD` and strip the leading `origin/`.
+>    - If unset, use `git ls-remote --symref origin HEAD` and parse the `ref: refs/heads/<name>` line. This requires network access, so tolerate failure.
+>    - If git cannot resolve it (no remote configured, detached state, offline, etc.), fall back to `main` and state explicitly in your summary that the fallback was used.
+>    - Record the resolved name as `<default-branch>` and use it in the steps below.
+> 2. Identify the current active branch name.
+> 3. If the current branch is the default branch (`<default-branch>`):
 >    - Execute `git diff HEAD -- Bugs.md` (or check uncommitted/staged diffs for `Bugs.md`).
 >    - Determine the branch type prefix: select `bugfix/` if `Bugs.md` has been modified and any bug entry was marked as completed (e.g., status updated to `RESOLVED`). Otherwise, select `feature/`.
 >    - Construct a new branch using the exact format: `[feature/bugfix]/[Extracted-Version]-[short-description]` (e.g., `bugfix/v1.0.7-fix-install-titles` or `feature/v1.0.7-user-confirmation-flows`).
 >    - Create and switch to this new branch.
-> 3. If the repository is already checked out to a feature or bugfix branch (any branch other than `main`), continue using that active branch without creating a new one.
+> 4. If the repository is already checked out to a feature or bugfix branch (any branch other than `<default-branch>`), continue using that active branch without creating a new one.
 > 
-> Return the final confirmed branch name back to the orchestrator.
+> Return the final confirmed branch name and the resolved `<default-branch>` back to the orchestrator.
 
-**WAIT:** Do not proceed until the branch status has been confirmed and returned.
+**WAIT:** Do not proceed until the branch status and the resolved default branch have been confirmed and returned.
 
 ---
 
