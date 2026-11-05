@@ -78,7 +78,7 @@ Record a verification item with `todowrite`, then call the `subagent` tool with 
 > - *Session Cleanup:* Terminate and clean up application instances or interactive test sessions once states are captured.
 > - **EARLY SHORT-CIRCUIT:** If manual dynamic testing reveals failures, unexpected crashes, or incorrect behavior during execution, **STOP IMMEDIATELY**. Do not proceed to Step 2 (Automated Testing). Log failures and enter the error handling loop.
 > 
-> 2. **Automated Testing:** ONLY if Manual Dynamic Testing passes completely, proceed to automated testing. Read `./Testing Strategy.md` to extract the project's designated test suite command. Run the regression test suite using the extracted test command.
+> 2. **Automated Testing:** ONLY if Manual Dynamic Testing passes completely, proceed to automated testing. Read `./Testing Strategy.md` to extract the **primary test suite execution command** designated by the document. Execute that command to verify no regressions were introduced. Do not substitute a longer or release-only full suite for it.
 > 
 > Return the verification summaries and test results to the orchestrator.
 > 
