@@ -28,7 +28,7 @@ Record the following three analysis steps with `todowrite` and dispatch each thr
 Include the following context in every delegation prompt:
 
 - Read `./Testing Strategy.md` to locate the designated testing folders, testing principles, consolidation/workflow rules, and execution commands.
-- Extract the **primary test suite execution command** and any **targeted single-file runner commands** defined near the top of `./Testing Strategy.md` (or in its validation commands section). ALWAYS run tests using these designated commands. **DO NOT run tests or execute code using ad-hoc inline snippets (such as `python -c '[code]'`).**
+- Extract the **primary test suite execution command**, the **full/comprehensive test suite execution command** (if defined), and any **targeted single-file runner commands** defined near the top of `./Testing Strategy.md` (or in its validation commands section). ALWAYS run tests using these designated commands. **DO NOT run tests or execute code using ad-hoc inline snippets (such as `python -c '[code]'`).**
 - Only modify files inside the identified test directories.
 - Read `./Requirements.md` and **specifically Section 3 (Testing & Verification Status) of `./Plan.md`** before starting. Do not review core implementation tasks outside of this section.
 - Return a written summary of findings, including a list of specific fixes and consolidations needed.
@@ -76,7 +76,7 @@ Each delegation prompt must include:
 
 - The specific test file and the exact workflow test(s) to extend, consolidate, modify, or remove (from the Phase 1 analysis summaries).
 - The constraint: only modify files inside the project's designated test directories, and adhere strictly to the workflow-consolidation and settings-to-frontend rules in `./Testing Strategy.md`.
-- **Test Command Rule:** Read the targeted single-file test runner command (or primary test runner command) in `./Testing Strategy.md` and run it against the modified test file to verify the change without running out-of-scope release matrices.
+- **Test Command Rule:** Read the targeted single-file test runner command matching the modified test file's suite/directory (or the primary test runner command if no single-file runner is specified) in `./Testing Strategy.md` and run it against the modified test file to verify the change.
 - **Iterative Verification:** After applying the changes, run the relevant test file command to verify that the consolidated/updated workflow passes cleanly. Continue adjusting the test until it passes.
 - **Unresolvable Blockers & Bug Filing:** If a test fails due to a bug or limitation in core source code (which cannot be modified per constraints):
   1. Stop attempting to modify the test file.
@@ -107,10 +107,10 @@ Each delegation prompt must include:
    
    **WAIT:** Do not proceed until all testing layers pass cleanly.
    
-3. **Final Suite Validation:**
-   Once all fix items are complete, dispatch a final `subagent` call (`agent: general`) to **re-run the entire primary test suite execution command** extracted from `./Testing Strategy.md`. 
+3. **Final Full-Suite Validation:**
+   Once the primary test suite passes cleanly, record a final suite validation item with `todowrite` and dispatch a `subagent` call (`agent: general`) to extract and execute the **full/comprehensive test suite execution command** defined in `./Testing Strategy.md` (if `./Testing Strategy.md` does not define a separate full/comprehensive suite command, re-run the **primary test suite execution command**). If any tests fail during this run, repeat Step 2 (Iterative Repair Loop) for each failing test file using its targeted single-file runner command, then re-run the full/comprehensive test suite execution command as the final command. 
    
-**WAIT:** Repeat this verification loop until the `general` subagent explicitly confirms that the **entire primary test suite runs and passes cleanly with zero failures** (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `sdlc-bug-create`).
+**WAIT:** Repeat this verification loop until the `general` subagent explicitly confirms that both the **primary test suite** and the **full/comprehensive test suite** run and pass cleanly with zero failures (or provides a summary of remaining failures that have been successfully logged to `./Bugs.md` via `sdlc-bug-create`).
 
 ---
 
