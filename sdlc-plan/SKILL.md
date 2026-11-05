@@ -62,7 +62,7 @@ Based on the verified findings from Phase 1, record the Plan generation step wit
 > - **Revision Jump Context (If applicable):** If intermediate revisions were jumped (e.g., `1.1.0` → `1.1.2`), include a sub-section explicitly listing all intermediate versions processed during this planning cycle and their primary changes.
 > - **Section 1: Current State Assessment** (Verification table and remaining structural/functional drift breakdown).
 > - **Section 2: Core Engineering Decisions or Filename Consistency** (Architectural alignment for all target changes).
-> - **Section 3: Testing & Verification Status** (Unit, Integration, E2E/Playwright, and Manual Checklists for remaining/new work using `- [ ]` checkboxes).
+> - **Section 3: Testing & Verification Status** (Unit, Integration, E2E, and Manual Checklists for remaining/new work using `- [ ]` checkboxes).
 >   - **Extend Existing Workflows First:** Frame test tasks around extending the existing workflow tests defined in `./Testing Strategy.md` rather than creating a separate standalone test per requirement bullet. Propose a new test only when a feature introduces a genuinely distinct workflow or isolated edge case.
 >   - **Settings → Frontend Verification:** For any new or modified configurable setting, specify testing it by setting a custom value on the settings page and verifying that value on the frontend — never by checking default values on the homepage.
 >   - **Consolidation & Inventory Sync:** Include `- [ ]` tasks to merge any redundant or single-property tests in the affected test files and to update the canonical test list and enumerated counts in `./Testing Strategy.md`.
