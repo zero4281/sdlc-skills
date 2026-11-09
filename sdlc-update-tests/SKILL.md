@@ -47,16 +47,17 @@ Include the following context in every delegation prompt:
 
 **WAIT:** Do not proceed until Item 1 is complete and the summary is returned.
 
-### Item 2 — Stale & Redundant Tests
+### Item 2 — Stale, Redundant & Excess Tests (Test Count & Execution Time Optimization)
 
-> Scan the existing tests within the designated test directories for both **staleness** and **redundancy** against `./Requirements.md`, current source code, and the consolidation guidelines in `./Testing Strategy.md`:
+> Scan the existing tests within the designated test directories with a strict focus on **aggressively reducing test count and execution time** (especially for End-to-End [E2E] / UI / browser test suites where setup, navigation, and teardown overhead is high) against `./Requirements.md`, current source code, and the consolidation guidelines in `./Testing Strategy.md`:
 > 1. **Stale Tests:** Identify tests that no longer match the current source code or requirements (e.g., outdated selectors, return values, removed methods, changed geometry, or superseded behavior).
-> 2. **Redundant & Fragmented Tests:** Identify tests that violate the consolidation guidelines in `./Testing Strategy.md`, including:
->    - Separate single-property or single-field tests that repeat the same setup, login, form save, or HTTP request and should be combined into a unified workflow test.
+> 2. **Redundant, Fragmented & Slow Tests:** Identify tests that violate the consolidation guidelines or bloat execution time in `./Testing Strategy.md`, including:
+>    - Separate single-property, single-field, or granular micro-tests that repeat the same setup, login, form save, or HTTP request and should be merged into unified multi-step workflow tests.
+>    - Overlapping test cases across suites that verify the same functional behaviors.
 >    - Tests that check hard-coded default values on the homepage/frontend when they should be setting custom values in the settings page and testing for those values.
 >    - Tests that misuse client-side config overrides as a substitute for real settings persistence, or duplicate coverage already provided by another test in the suite.
 > 
-> Return a written summary listing each stale or redundant test group and the specific update or consolidation needed.
+> Return a written summary listing each stale, redundant, or fragmented test group, proposed test consolidations or removals to shrink the test suite and execution time, and the specific update needed.
 
 **WAIT:** Do not proceed until Item 2 is complete and the summary is returned.
 
@@ -74,7 +75,7 @@ Once all three analysis steps are complete and their summaries are returned, gro
 
 Each delegation prompt must include:
 
-- The specific test file and the exact workflow test(s) to extend, consolidate, modify, or remove (from the Phase 1 analysis summaries).
+- The specific test file and the exact workflow test(s) to extend, consolidate, modify, or remove (from the Phase 1 analysis summaries), prioritizing aggressive consolidation of micro-tests into unified multi-step workflows to reduce overall test count and test suite execution time.
 - The constraint: only modify files inside the project's designated test directories, and adhere strictly to the workflow-consolidation and settings-to-frontend rules in `./Testing Strategy.md`.
 - **Test Command Rule:** Read the targeted single-file test runner command matching the modified test file's suite/directory (or the primary test runner command if no single-file runner is specified) in `./Testing Strategy.md` and run it against the modified test file to verify the change.
 - **Iterative Verification:** After applying the changes, run the relevant test file command to verify that the consolidated/updated workflow passes cleanly. Continue adjusting the test until it passes.
